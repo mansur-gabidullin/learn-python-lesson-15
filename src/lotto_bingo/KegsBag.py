@@ -22,9 +22,8 @@ class KegsBag:
         keg = random.choice(self.__kegs)
         return self.__kegs.pop(self.__kegs.index(keg))
 
-    @property
-    def numbers(self):
-        return self.__numbers
+    def __contains__(self, key):
+        return key in self.__numbers
 
     def get_sample(self, count):
-        return random.sample(self.numbers, count)
+        return random.sample(self.__numbers, count)
