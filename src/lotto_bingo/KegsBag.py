@@ -1,18 +1,13 @@
 import random
-from typing import Final
+from typing import List
 
 from src.lotto_bingo.constants import KEGS_COUNT
 
 
 class KegsBag:
-    KEG_NUMBERS: Final = range(1, KEGS_COUNT + 1)
-
-    @classmethod
-    def get_sample(cls, count):
-        return random.sample(cls.KEG_NUMBERS, count)
-
-    def __init__(self, count: int = None):
-        self.__kegs = KegsBag.get_sample(count or KEGS_COUNT)
+    def __init__(self, count: int = None, numbers: List[int] = None):
+        self.__numbers = numbers or range(1, KEGS_COUNT + 1)
+        self.__kegs = self.get_sample(count or KEGS_COUNT)
 
     def __len__(self):
         return len(self.__kegs)
@@ -26,3 +21,10 @@ class KegsBag:
 
         keg = random.choice(self.__kegs)
         return self.__kegs.pop(self.__kegs.index(keg))
+
+    @property
+    def numbers(self):
+        return self.__numbers
+
+    def get_sample(self, count):
+        return random.sample(self.numbers, count)
