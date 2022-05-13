@@ -5,7 +5,7 @@ from src.lotto_bingo.constants import KEGS_COUNT
 
 
 class KegsBag:
-    def __init__(self, count: int = None, numbers: List[int] = None):
+    def __init__(self, numbers: List[int] = None, count: int = None):
         numbers = numbers or range(1, KEGS_COUNT + 1)
         self.__kegs = random.sample(numbers, count or KEGS_COUNT)
 
