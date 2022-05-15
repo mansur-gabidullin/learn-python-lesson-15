@@ -77,11 +77,8 @@ commands =
     poe test-quick
 """
 
-[tool.coverage.report]
-omit = ["src/tests/*"]
-
 [tool.pytest.ini_options]
-addopts = "--cov-config=.coveragerc --cov=src --cov-report=html"
+addopts = "--cov-config=.coveragerc --cov=src/lotto_bingo --cov-report=html"
 pythonpath = ["."]
 markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
 
