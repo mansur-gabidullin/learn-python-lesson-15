@@ -1,5 +1,5 @@
 import random
-from math import floor
+from math import floor, ceil
 from typing import List
 
 from src.lotto_bingo.constants import CARD_ROWS_COUNT, CARD_COLS_COUNT, CARD_NUMBERS_COUNT_IN_ROW, KEGS_COUNT
@@ -24,7 +24,7 @@ def get_cells(numbers: List[int]):
 class Card:
     def __init__(self, numbers: List[int] = None):
         if numbers:
-            self.__numbers = numbers
+            self.__numbers = numbers.copy()
         else:
             numbers_count = CARD_ROWS_COUNT * CARD_NUMBERS_COUNT_IN_ROW
             numbers_range = range(1, KEGS_COUNT + 1)
@@ -46,9 +46,9 @@ class Card:
         return len(self.__numbers)
 
     def strike_out(self, number):
-        index = self.__numbers.index(number)
-        row = floor(index / CARD_NUMBERS_COUNT_IN_ROW)
-        cell = self.__grid[row].index(str(number))
-        cell_content = self.__grid[row][cell]
-        self.__grid[row][cell] = strike(cell_content)
-        del self.__numbers[index]
+        self.__numbers.remove(number)
+        cell = str(number)
+        for row in self.__grid:
+            if cell in row:
+                cell_index = row.index(str(number))
+                row[cell_index] = strike(row[cell_index])
