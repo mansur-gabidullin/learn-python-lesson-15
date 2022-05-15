@@ -24,10 +24,10 @@ class Player(metaclass=ABCMeta):
 class HumanPlayer(Player):
     @property
     def type(self):
-        return 'human'
+        return "human"
 
 
 class ComputerPlayer(Player):
     @property
     def type(self):
-        return 'computer'
+        return "computer"

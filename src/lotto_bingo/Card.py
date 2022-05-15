@@ -2,7 +2,12 @@ import random
 from math import floor, ceil
 from typing import List
 
-from src.lotto_bingo.constants import CARD_ROWS_COUNT, CARD_COLS_COUNT, CARD_NUMBERS_COUNT_IN_ROW, KEGS_COUNT
+from src.lotto_bingo.constants import (
+    CARD_ROWS_COUNT,
+    CARD_COLS_COUNT,
+    CARD_NUMBERS_COUNT_IN_ROW,
+    KEGS_COUNT,
+)
 from src.lotto_bingo.utils import strike
 
 
@@ -17,7 +22,7 @@ def get_cells(numbers: List[int]):
             number_index += 1
             rest_numbers -= 1
         else:
-            yield ''
+            yield ""
         rest_cells -= 1
 
 
@@ -30,17 +35,25 @@ class Card:
             numbers_range = range(1, KEGS_COUNT + 1)
             self.__numbers = random.sample(numbers_range, numbers_count)
 
-        self.__grid = [list(get_cells(self.__numbers[i * CARD_NUMBERS_COUNT_IN_ROW:])) for i in range(CARD_ROWS_COUNT)]
+        self.__grid = [
+            list(get_cells(self.__numbers[i * CARD_NUMBERS_COUNT_IN_ROW :]))
+            for i in range(CARD_ROWS_COUNT)
+        ]
 
     def __contains__(self, key):
         return key in self.__numbers
 
     def __str__(self):
-        return '\n'.join([
-            '-'.join(['--'] * 9),
-            *(' '.join(map(lambda cell: cell.rjust(2), row)) for row in self.__grid),
-            '-'.join(['--'] * 9),
-        ])
+        return "\n".join(
+            [
+                "-".join(["--"] * 9),
+                *(
+                    " ".join(map(lambda cell: cell.rjust(2), row))
+                    for row in self.__grid
+                ),
+                "-".join(["--"] * 9),
+            ]
+        )
 
     def __len__(self):
         return len(self.__numbers)
