@@ -1,12 +1,14 @@
+"""Test Card class."""
 import re
 
 import pytest
 
-from src.lotto_bingo.Card import Card
-from src.lotto_bingo.utils import strike
+from src.lotto_bingo.card import Card
+from src.lotto_bingo.utils import striked
 
 
-def test_card():
+def test_card() -> None:
+    """Test card"""
     card = Card(list(range(1, 16)))
     assert re.sub("[- \n]", "", str(card)) == "123456789101112131415"
     card = Card()
@@ -17,4 +19,4 @@ def test_card():
     assert 1 in card
     card.strike_out(1)
     assert 1 not in card
-    assert re.sub("[- \n]", "", str(card)) == strike("1")
+    assert re.sub("[- \n]", "", str(card)) == striked("1")

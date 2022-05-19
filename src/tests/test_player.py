@@ -1,11 +1,15 @@
+"""
+Tests for class Player
+"""
 import pytest
 
-from src.lotto_bingo.Card import Card
-from src.lotto_bingo.KegsBag import KegsBag
-from src.lotto_bingo.Player import HumanPlayer, ComputerPlayer, Player
+from src.lotto_bingo.card import Card
+from src.lotto_bingo.kegs_bag import KegsBag
+from src.lotto_bingo.player import HumanPlayer, ComputerPlayer, Player
 
 
-def test_player():
+def test_player() -> None:
+    """Test player"""
     bag = KegsBag([1])
 
     human_player = HumanPlayer("Human Tester", Card([1]))
@@ -21,4 +25,4 @@ def test_player():
     assert keg not in computer_player.card
 
     with pytest.raises(TypeError):
-        Player("test", Card())
+        Player("test", Card())  # pylint: disable=abstract-class-instantiated

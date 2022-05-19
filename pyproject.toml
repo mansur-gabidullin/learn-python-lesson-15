@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "learn-python-lesson-15"
 version = "0.1.0"
-description = "home work "
+description = "home work"
 authors = ["Mansur Gabidullin <mansur.gabidullin@gmail.com>"]
-readme      = "README.md"
-license     = "MIT"
-repository  = "https://github.com/mansur-gabidullin/learn-python-lesson-15"
-homepage    = "https://github.com/mansur-gabidullin/learn-python-lesson-15"
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/mansur-gabidullin/learn-python-lesson-15"
+homepage = "https://github.com/mansur-gabidullin/learn-python-lesson-15"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -14,10 +14,11 @@ python = "^3.8"
 [tool.poetry.dev-dependencies]
 poethepoet = "^0.13.1"
 black = "^22.3.0"
-pytest = "^7.1.2"
 mypy = "^0.950"
 pylint = "^2.13.9"
+pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
+pre-commit = "^2.19.0"
 
 [tool.poetry.extras]
 poetry_plugin = ["poetry"]
@@ -28,42 +29,45 @@ poe = "poethepoet:main"
 [tool.poetry.plugins."poetry.application.plugin"]
 poethepoet = "poethepoet.plugin:PoetryPlugin"
 
-[tool.poe.tasks]
-    [tool.poe.tasks.start]
-    help = "Run game lotto bingo"
-    cmd  = "python index.py"
+[tool.poe.tasks.start]
+help = "Run game lotto bingo"
+cmd = "python index.py"
 
-    [tool.poe.tasks.format]
-    help = "Run black on the code base"
-    cmd  = "black ."
+[tool.poe.tasks.format]
+help = "Run black on the code base"
+cmd = "black ."
 
-    [tool.poe.tasks.test]
-    help = "Run unit and feature tests"
-    cmd  = "pytest"
+[tool.poe.tasks.test]
+help = "Run unit and feature tests"
+cmd = "pytest"
 
-    [tool.poe.tasks.test-quick]
-    help = "Run unit and feature tests, excluding slow ones"
-    cmd  = "pytest -m=\"not slow\""
+[tool.poe.tasks.test-quick]
+help = "Run unit and feature tests, excluding slow ones"
+cmd = "pytest -m=\"not slow\""
 
-    [tool.poe.tasks.types]
-    help = "Run the type checker"
-    cmd  = "mypy src --ignore-missing-imports"
+[tool.poe.tasks.coverage]
+help = "Run unit and feature tests"
+cmd = "coverage html"
 
-    [tool.poe.tasks.lint]
-    help = "Run the linter"
-    cmd  = "pylint src"
+[tool.poe.tasks.types]
+help = "Run the type checker"
+cmd = "mypy --strict"
 
-    [tool.poe.tasks.style]
-    help = "Validate code style"
-    cmd  = "black . --check --diff"
+[tool.poe.tasks.lint]
+help = "Run the linter"
+cmd = "pylint src"
 
-    [tool.poe.tasks.check]
-    help     = "Run all checks on the code base"
-    sequence = ["style", "types", "lint", "test"]
+[tool.poe.tasks.style]
+help = "Validate code style"
+cmd = "black . --check --diff"
 
-    [tool.poe.tasks.poe]
-    help   = "Execute poe from this repo (useful for testing)"
-    script = "poethepoet:main"
+[tool.poe.tasks.check]
+help = "Run all checks on the code base"
+sequence = ["style", "types", "lint", "test"]
+
+[tool.poe.tasks.poe]
+help = "Execute poe from this repo (useful for testing)"
+script = "poethepoet:main"
 
 [tool.tox]
 legacy_tox_ini = """
@@ -78,9 +82,26 @@ commands =
 """
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=.coveragerc --cov=src/lotto_bingo --cov-report=html"
+addopts = "--cov-config=.coveragerc --cov=src/lotto_bingo"
 pythonpath = ["."]
 markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
+
+[tool.pylint.master]
+init-hook = 'import sys; sys.path.append(".")'
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.mypy]
+python_version = "3.8"
+mypy_path = ["src"]
+files = ["src/"]
+strict = true
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

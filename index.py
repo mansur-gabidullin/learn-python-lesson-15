@@ -1,4 +1,4 @@
-from src.lotto_bingo.Game import Game
+from src.lotto_bingo.game import Game
 
 if __name__ == "__main__":
     game = Game()
