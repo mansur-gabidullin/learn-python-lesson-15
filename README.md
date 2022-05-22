@@ -6,6 +6,7 @@ https://lk.neural-university.ru/lesson/797
 
 ## Requirements
 * [Poetry](https://python-poetry.org/docs/) -- is a tool for dependency management and packaging in Python.
+* configure IDE to use poetry python interpreter in `.venv` folder
 
 ## How to start
 Open a terminal in a project root folder and run next commands:

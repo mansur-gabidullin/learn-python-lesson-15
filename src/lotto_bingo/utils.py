@@ -12,7 +12,9 @@ def need_break() -> bool:
     print("1. Нет")
     print("2. Да")
     try:
-        return int(input()) == 2
+        if (answer := int(input())) not in [1, 2]:
+            raise ValueError()
+        return answer == 2
     except ValueError:
         return False
 
