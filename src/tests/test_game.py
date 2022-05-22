@@ -1,23 +1,27 @@
 """Test Game class."""
+from itertools import cycle
+from unittest.mock import patch
+
 from src.lotto_bingo.game import Game
+from src.lotto_bingo.game_strategy import InitialGameState
+from src.lotto_bingo.player import get_players
 
 
-def test_game() -> None:
+@patch("builtins.print", return_value=None)
+@patch("builtins.input", side_effect=cycle([""]))
+def test_game(*_) -> None:
     """Test game"""
-    Game(players_count=100, is_auto=True).start()
+    game = Game()
+    game.start(InitialGameState(players=get_players(10)))
 
 
-def test_player_can_lose() -> None:
+@patch("builtins.print", return_value=None)
+@patch("builtins.input", side_effect=cycle(["1", "2"]))
+def test_player_can_lose(*_) -> None:
     """Test player can lose"""
     winner = None
     for _ in range(100):
-        winner = Game(players_count=2, is_auto=True).start()
+        winner = Game().start()
         if not winner:
             break
     assert not winner
-
-
-def test_player_can_win() -> None:
-    """Test player can win"""
-    winner = Game(players_count=1, is_auto=True).start()
-    assert winner

@@ -14,7 +14,9 @@ def test_get_next() -> None:
     """Test getting next keg"""
     kegs_bag = KegsBag([1])
     assert len(kegs_bag) == 1
+    assert str(kegs_bag) == "[1]"
     kegs_bag.get_next()
     assert len(kegs_bag) == 0
+    assert str(kegs_bag) == "[]"
     with pytest.raises(IndexError):
         kegs_bag.get_next()
