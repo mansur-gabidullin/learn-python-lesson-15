@@ -3,14 +3,14 @@ from abc import ABCMeta, abstractmethod
 from typing import Literal, Iterator, Type
 
 from src.lotto_bingo.card import Card
-from src.lotto_bingo.utils import clear, wait, blinked, bolded, underlined
+from src.lotto_bingo.utils import clear
 
 
 class Player(metaclass=ABCMeta):
     """Player class"""
 
-    def __init__(self, name: str, card: Card = None):
-        self.__name, self.__card = name, card
+    def __init__(self, name: str | None = None, card: Card = None):
+        self.__name, self.__card = name or "anonymous", card or Card()
 
     @property
     def name(self) -> str:
@@ -48,6 +48,8 @@ class ComputerPlayer(Player):
 def get_players(
     players_count: int | None = None, player_class: Type[ComputerPlayer] | Type[HumanPlayer] | None = None
 ) -> Iterator[ComputerPlayer | HumanPlayer]:
+    """generate (yields) a player sequence"""
+
     if not players_count:
         print("Сколько игроков будет играть?")
         try:

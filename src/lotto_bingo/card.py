@@ -2,12 +2,7 @@
 import random
 from typing import List, Iterator
 
-from src.lotto_bingo.constants import (
-    CARD_ROWS_COUNT,
-    CARD_COLS_COUNT,
-    CARD_NUMBERS_COUNT_IN_ROW,
-    KEGS_COUNT,
-)
+from src.lotto_bingo.constants import CARD_ROWS_COUNT, CARD_COLS_COUNT, CARD_NUMBERS_COUNT_IN_ROW, KEGS_COUNT
 from src.lotto_bingo.utils import striked
 
 
@@ -33,7 +28,7 @@ class Card:
     _numbers: List[int]
     _grid: List[List[str]]
 
-    def __init__(self, numbers: List[int] = None):
+    def __init__(self, numbers: List[int] | None = None):
         if numbers:
             self._numbers = numbers.copy()
         else:

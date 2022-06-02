@@ -1,4 +1,5 @@
 """Utilities."""
+from typing import Any
 
 
 def clear() -> None:
@@ -12,9 +13,9 @@ def need_break() -> bool:
     print("1. Нет")
     print("2. Да")
     try:
-        if (answer := int(input())) not in [1, 2]:
+        if (user_answer := int(input())) not in [1, 2]:
             raise ValueError()
-        return answer == 2
+        return user_answer == 2
     except ValueError:
         return False
 
@@ -48,3 +49,8 @@ def greened(text: str) -> str:
 def blinked(text: str) -> str:
     """Add blinked style to text"""
     return "\x1b[5m" + text + "\x1b[25m"
+
+
+def identity(_: Any) -> Any:
+    """returns identity stuff"""
+    return _

@@ -1,4 +1,5 @@
 """Kegs Bag Entity."""
+
 import random
 from typing import List, Iterator
 
@@ -8,8 +9,8 @@ from src.lotto_bingo.constants import KEGS_COUNT
 class KegsBag:
     """KegsBag class"""
 
-    def __init__(self, kegs: List[int] = None):
-        if kegs:
+    def __init__(self, kegs: List[int] | None = None):
+        if kegs is not None:
             self.__kegs = kegs
         else:
             numbers = range(1, KEGS_COUNT + 1)

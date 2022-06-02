@@ -5,6 +5,7 @@ from src.lotto_bingo.player import Player
 from src.lotto_bingo.utils import clear, underlined, greened, blinked, bolded
 
 
+# pylint: disable=too-few-public-methods
 class Game:
     """Game class"""
 
