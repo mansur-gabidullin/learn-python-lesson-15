@@ -1,3 +1,4 @@
+"""Constants."""
 from typing import Final
 
 KEGS_COUNT: Final = 90

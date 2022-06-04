@@ -1,17 +1,47 @@
+"""Test KegsBag class."""
 import pytest
 
-from src.lotto_bingo.KegsBag import KegsBag
+from src.lotto_bingo.constants import KEGS_COUNT
+from src.lotto_bingo.kegs_bag import KegsBag
 
 
+# pylint: disable=no-self-use
 class TestKegsBag:
-    def test_iter(self):
+    """Test Kegs Bag Entity"""
+
+    def test_init(self) -> None:
+        """checks initialization"""
+        kegs_bag = KegsBag()
+        assert len(kegs_bag) == KEGS_COUNT
+
+    def test_init_with_kegs_list(self) -> None:
+        """checks initialization with passed kegs list"""
+        kegs_bag = KegsBag([1])
+        assert len(kegs_bag) == 1
+
+    def test_bag_contains_keg(self) -> None:
+        """checks kegs bag contains keg"""
+        kegs_bag = KegsBag([1])
+        assert 1 in kegs_bag
+
+    def test_iteration_on_kegs_bag(self) -> None:
+        """checks iterating on kegs"""
         kegs_bag = KegsBag(list(range(11)))
         assert all(isinstance(keg, int) and keg in kegs_bag for keg in kegs_bag)
 
-    def test_get_next(self):
+    def test_string_presentation(self) -> None:
+        """checks kegs bag string presentation"""
         kegs_bag = KegsBag([1])
-        assert len(kegs_bag) == 1
-        kegs_bag.get_next()
-        assert len(kegs_bag) == 0
+        assert str(kegs_bag) == "[1]"
+
+    def test_getting_next_keg(self) -> None:
+        """checks getting next keg from kegs bag"""
+        kegs_bag = KegsBag([1])
+        keg = kegs_bag.get_next()
+        assert isinstance(keg, int) and len(kegs_bag) == 0
+
+    def test_raising_index_error_for_getting_next_keg_on_empty_kegs_bag(self) -> None:
+        """checks raising IndexError for getting next keg on empty kegs bag"""
+        kegs_bag = KegsBag([])
         with pytest.raises(IndexError):
             kegs_bag.get_next()
