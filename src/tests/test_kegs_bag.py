@@ -45,3 +45,16 @@ class TestKegsBag:
         kegs_bag = KegsBag([])
         with pytest.raises(IndexError):
             kegs_bag.get_next()
+
+    def test_kegs_bags_are_equal(self) -> None:
+        """checks kegs bags are equal"""
+        kegs_bag_one = KegsBag()
+        kegs_bag_other = KegsBag()
+        assert kegs_bag_one == kegs_bag_other
+        assert kegs_bag_one != {"get_next": None}
+
+    def test_one_kegs_bag_is_great_then_other(self) -> None:
+        """checks kegs bag is great then other"""
+        kegs_bag_one = KegsBag([1])
+        kegs_bag_other = KegsBag([])
+        assert kegs_bag_one > kegs_bag_other

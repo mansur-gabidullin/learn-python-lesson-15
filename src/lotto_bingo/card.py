@@ -1,6 +1,7 @@
 """Card Entity."""
 import random
-from typing import List, Iterator
+from functools import total_ordering
+from typing import List, Iterator, Any
 
 from src.lotto_bingo.constants import CARD_ROWS_COUNT, CARD_COLS_COUNT, CARD_NUMBERS_COUNT_IN_ROW, KEGS_COUNT
 from src.lotto_bingo.utils import striked
@@ -22,6 +23,7 @@ def get_cells(numbers: List[int], count: int | None = None, length: int | None =
         rest_cells -= 1
 
 
+@total_ordering
 class Card:
     """Card class"""
 
@@ -29,7 +31,7 @@ class Card:
     _grid: List[List[str]]
 
     def __init__(self, numbers: List[int] | None = None):
-        if numbers:
+        if numbers is not None:
             self._numbers = numbers.copy()
         else:
             numbers_count = CARD_ROWS_COUNT * CARD_NUMBERS_COUNT_IN_ROW
@@ -53,6 +55,14 @@ class Card:
 
     def __len__(self) -> int:
         return len(self._numbers)
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(self, other.__class__):
+            return False
+        return all((number in other._numbers for number in self._numbers))
+
+    def __gt__(self, other: Any) -> bool:
+        return len(self) > len(other)
 
     def strike_out(self, number: int) -> None:
         """Strike out given keg number from card"""

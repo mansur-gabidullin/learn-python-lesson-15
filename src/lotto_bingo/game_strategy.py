@@ -1,5 +1,6 @@
 """Game Strategy Entity"""
-from typing import Optional, List, TypedDict, Iterable
+from functools import total_ordering
+from typing import Optional, List, TypedDict, Iterable, Any
 
 from src.lotto_bingo.kegs_bag import KegsBag
 from src.lotto_bingo.player import get_players, ComputerPlayer, HumanPlayer
@@ -11,7 +12,11 @@ InitialGameState = TypedDict(
     total=False,
 )
 
+MESSAGE_GAME_CONTINUE = "Игра продолжается"
+MESSAGE_GAME_FINISHED = "Игра окончена"
 
+
+@total_ordering
 class GameStrategy:
     """GameStrategy class"""
 
@@ -19,6 +24,17 @@ class GameStrategy:
     _kegs: KegsBag = None
     _losers: List[ComputerPlayer | HumanPlayer] = []
     _players: List[ComputerPlayer | HumanPlayer] = []
+
+    def __str__(self) -> str:
+        return MESSAGE_GAME_CONTINUE if self.is_running() else MESSAGE_GAME_FINISHED
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(self, other.__class__):
+            return False
+        return self._kegs == other._kegs and all((player in other._players for player in self._players))
+
+    def __gt__(self, other: Any) -> bool:
+        return len(self._players) > len(other._players)
 
     @property
     def winner(self) -> ComputerPlayer | HumanPlayer | None:
@@ -63,7 +79,7 @@ class GameStrategy:
         """make player's move"""
         clear()
         current_card = player.card
-        print(f'Ходит игрок "{player.name}" ({player.type})')
+        print(f'Ходит игрок "{player}')
 
         if player.type == "computer":
             if keg in current_card:
@@ -90,7 +106,7 @@ class GameStrategy:
             if keg in current_card and not need_strike or keg not in current_card and need_strike:
                 self._losers.append(player)
                 clear()
-                print(blinked(f'Игрок "{player.name}" ({player.type}) ' + underlined(bolded("ПРОИГРАЛ!"))))
+                print(blinked(f"Игрок {player} {underlined(bolded('ПРОИГРАЛ!'))}"))
                 wait()
 
             if need_strike and keg in current_card:
@@ -123,7 +139,7 @@ class GameStrategy:
                 print("Компьютеры:")
 
                 for computer in computers:
-                    print(f'Карточка "{computer.name}":')
+                    print(f'Карточка "{computer}":')
                     print(computer.card)
 
             if len(humans) > 0:
@@ -131,7 +147,7 @@ class GameStrategy:
                 print("Люди:")
 
                 for human in humans:
-                    print(f'Карточка "{human.name}":')
+                    print(f'Карточка "{human}":')
                     print(human.card)
 
             wait()
