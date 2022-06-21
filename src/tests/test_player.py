@@ -8,7 +8,7 @@ import pytest
 
 from src.lotto_bingo.card import Card
 from src.lotto_bingo.kegs_bag import KegsBag
-from src.lotto_bingo.player import HumanPlayer, ComputerPlayer, Player, get_players
+from src.lotto_bingo.player import HumanPlayer, ComputerPlayer, Player, generate_players
 
 # pylint: disable=no-self-use,attribute-defined-outside-init
 from src.lotto_bingo.utils import bolded, underlined
@@ -73,10 +73,10 @@ class TestPlayer:
 
 
 @patch("builtins.print", return_value=None)
-def test_get_players(*_: Any) -> None:
+def test_generate_players(*_: Any) -> None:
     """checks get players method"""
     with patch("builtins.input", side_effect=["2", "1", "Test-1", "2", "Test-2"]):
-        players = list(get_players())
+        players = list(generate_players())
         assert len(players) == 2
         assert all(isinstance(player, Player) for player in players)
         assert isinstance(players[0], ComputerPlayer)
@@ -85,18 +85,18 @@ def test_get_players(*_: Any) -> None:
         assert players[1].name == "Test-2"
 
     with patch("builtins.input", return_value="10"):
-        players = list(get_players(10, ComputerPlayer))
+        players = list(generate_players(10, ComputerPlayer))
         assert len(players) == 10
         assert all(isinstance(player, ComputerPlayer) for player in players)
 
     with patch("builtins.input", side_effect=["foo-bar-baz"]):
-        players = list(get_players())
+        players = list(generate_players())
         assert len(players) == 0
 
     with patch("builtins.input", side_effect=["-1"]):
-        players = list(get_players())
+        players = list(generate_players())
         assert len(players) == 0
 
     with patch("builtins.input", side_effect=["-1", "-1"]):
-        players = list(get_players(1))
+        players = list(generate_players(1))
         assert len(players) == 1

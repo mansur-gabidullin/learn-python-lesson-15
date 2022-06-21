@@ -58,7 +58,7 @@ class ComputerPlayer(Player):
         return "computer"
 
 
-def get_players(
+def generate_players(
     players_count: int | None = None, player_class: Type[ComputerPlayer] | Type[HumanPlayer] | None = None
 ) -> Iterator[ComputerPlayer | HumanPlayer]:
     """generate (yields) a player sequence"""

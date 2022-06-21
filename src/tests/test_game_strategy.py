@@ -21,42 +21,37 @@ from src.lotto_bingo.utils import identity
 class TestGameStrategy:
     """Test GameStrategy class"""
 
-    @patch("src.lotto_bingo.game_strategy.get_players", return_value=[ComputerPlayer("Test", Card())])
+    @patch("src.lotto_bingo.game_strategy.generate_players", return_value=[ComputerPlayer("Test", Card())])
     def test_prepare_method(self, *_: Any) -> None:
         """checks prepare method"""
         strategy = GameStrategy()
-        strategy.prepare()
         assert not strategy.winner
 
-    @patch("src.lotto_bingo.game_strategy.get_players", return_value=[ComputerPlayer("Test", Card())])
+    @patch("src.lotto_bingo.game_strategy.generate_players", return_value=[ComputerPlayer("Test", Card())])
     def test_prepare_method_with_empty_state(self, *_: Any) -> None:
         """checks prepare method with given an empty state"""
         state = InitialGameState()
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
     def test_prepare_method_with_custom_state(self, *_: Any) -> None:
         """checks prepare method with given a custom state"""
         computer = ComputerPlayer("custom computer", Card())
         state = InitialGameState(players=[computer], losers=[computer], kegs=KegsBag(list(range(KEGS_COUNT))))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
     def test_prepare_method_with_incorrect_state(self, *_: Any) -> None:
         """checks prepare method with given an incorrect state"""
         state = InitialGameState(players=[], losers=[], kegs=KegsBag([]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
     def test_computer_move(self, *_: Any) -> None:
         """checks computer movement"""
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[computer], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == computer
 
@@ -65,8 +60,7 @@ class TestGameStrategy:
         """checks human movement"""
         human = HumanPlayer("custom human", Card([1]))
         state = InitialGameState(players=[human], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == human
 
@@ -74,8 +68,7 @@ class TestGameStrategy:
         """checks no cards is printed when no other players"""
         human = HumanPlayer("custom human")
         state = InitialGameState(players=[human])
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.show_other_players_cards(human)
         assert not print_mock.called
 
@@ -88,8 +81,7 @@ class TestGameStrategy:
                 human = HumanPlayer("custom human")
                 computer = ComputerPlayer("custom computer")
                 state = InitialGameState(players=[human, computer])
-                strategy = GameStrategy()
-                strategy.prepare(state)
+                strategy = GameStrategy(state)
                 strategy.show_other_players_cards(human)
 
                 assert not human_card_mock.called
@@ -104,8 +96,7 @@ class TestGameStrategy:
                 human = HumanPlayer("custom human")
                 computer = ComputerPlayer("custom computer")
                 state = InitialGameState(players=[human, computer])
-                strategy = GameStrategy()
-                strategy.prepare(state)
+                strategy = GameStrategy(state)
                 strategy.show_other_players_cards(computer)
 
                 assert human_card_mock.called
@@ -118,8 +109,7 @@ class TestGameStrategy:
         human2 = HumanPlayer("custom human 2", Card([1]))
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[human, human2, computer], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == human2
 
@@ -129,8 +119,7 @@ class TestGameStrategy:
         human2 = HumanPlayer("custom human 2", Card([1]))
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[human, human2, computer], losers=[human, human2, computer], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert not strategy.winner
 
@@ -138,28 +127,25 @@ class TestGameStrategy:
         """checks continue strategy status"""
         human = HumanPlayer("custom human", Card([1]))
         state = InitialGameState(players=[human], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert MESSAGE_GAME_CONTINUE in str(strategy)
 
     def test_finished_strategy_status(self, *_: Any) -> None:
         """checks finished strategy status"""
         state = InitialGameState(players=[])
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert MESSAGE_GAME_FINISHED in str(strategy)
 
     def test_game_strategies_are_equal(self, *_: Any) -> None:
         """checks game strategies are equal"""
-        strategy_one = GameStrategy()
-        strategy_other = GameStrategy()
+        state = InitialGameState(players=[])
+        strategy_one = GameStrategy(state)
+        strategy_other = GameStrategy(state)
         assert strategy_one == strategy_other
         assert strategy_one != {"winner": None}
 
     def test_one_game_strategy_is_great_then_other(self, *_: Any) -> None:
         """checks game strategy is great then other"""
-        strategy_one = GameStrategy()
-        strategy_one.prepare(InitialGameState(players=[ComputerPlayer("test computer")]))
-        strategy_other = GameStrategy()
-        strategy_other.prepare(InitialGameState(players=[]))
+        strategy_one = GameStrategy(InitialGameState(players=[ComputerPlayer("test computer")]))
+        strategy_other = GameStrategy(InitialGameState(players=[]))
         assert strategy_one > strategy_other

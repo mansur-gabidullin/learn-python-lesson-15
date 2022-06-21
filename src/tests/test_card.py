@@ -32,7 +32,7 @@ class TestCellsGenerator:
 
     def test_empty(self) -> None:
         """checks generate correct list if given empty list of numbers"""
-        assert len(list(get_cells([], 10, 5))) == 0
+        assert len(list(get_cells([], 10, 5))) == 5
 
 
 @patch("src.lotto_bingo.card.striked", side_effect=identity)

@@ -15,8 +15,7 @@ class Game:
     _strategy: GameStrategy
 
     def __init__(self, initial_state: InitialGameState | None = None):
-        self._strategy = GameStrategy()
-        self._strategy.prepare(initial_state)
+        self._strategy = GameStrategy(initial_state)
 
     def __str__(self) -> str:
         """Print the game status"""
