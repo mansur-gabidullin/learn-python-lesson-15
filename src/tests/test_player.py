@@ -1,17 +1,19 @@
 """
 Tests for class Player
 """
-from typing import Any, Iterable
+from typing import Any
 from unittest.mock import patch
 
 import pytest
 
 from src.lotto_bingo.card import Card
 from src.lotto_bingo.kegs_bag import KegsBag
-from src.lotto_bingo.player import HumanPlayer, ComputerPlayer, Player, get_players
-
+from src.lotto_bingo.player import HumanPlayer, ComputerPlayer, Player, generate_players
 
 # pylint: disable=no-self-use,attribute-defined-outside-init
+from src.lotto_bingo.utils import bolded, underlined
+
+
 class TestPlayer:
     """Test Player Entity"""
 
@@ -50,12 +52,31 @@ class TestPlayer:
         assert computer_player.type == "computer"
         assert computer_player.name == "test name" and computer_player.card == test_card
 
+    def test_printing_player_name(self) -> None:
+        """checks player class __str__ method"""
+        player = ComputerPlayer("test name")
+        player_name = str(player)
+        assert f"{bolded(underlined(player.name))} ({player.type})" == player_name
+
+    def test_players_are_equal(self) -> None:
+        """checks players are equal"""
+        player_one = ComputerPlayer(name="test player")
+        player_other = player_one
+        assert player_one == player_other
+        assert player_one != {"name": "test player"}
+
+    def test_one_player_is_great_then_other(self) -> None:
+        """checks player is great then other"""
+        player_one = ComputerPlayer(card=Card([1]))
+        player_other = ComputerPlayer(card=Card([]))
+        assert player_one > player_other
+
 
 @patch("builtins.print", return_value=None)
-def test_get_players(*_: Iterable[Any]) -> None:
+def test_generate_players(*_: Any) -> None:
     """checks get players method"""
     with patch("builtins.input", side_effect=["2", "1", "Test-1", "2", "Test-2"]):
-        players = list(get_players())
+        players = list(generate_players())
         assert len(players) == 2
         assert all(isinstance(player, Player) for player in players)
         assert isinstance(players[0], ComputerPlayer)
@@ -64,18 +85,18 @@ def test_get_players(*_: Iterable[Any]) -> None:
         assert players[1].name == "Test-2"
 
     with patch("builtins.input", return_value="10"):
-        players = list(get_players(10, ComputerPlayer))
+        players = list(generate_players(10, ComputerPlayer))
         assert len(players) == 10
         assert all(isinstance(player, ComputerPlayer) for player in players)
 
-    with patch("builtins.input", side_effect=["fadfas"]):
-        players = list(get_players())
+    with patch("builtins.input", side_effect=["foo-bar-baz"]):
+        players = list(generate_players())
         assert len(players) == 0
 
     with patch("builtins.input", side_effect=["-1"]):
-        players = list(get_players())
+        players = list(generate_players())
         assert len(players) == 0
 
     with patch("builtins.input", side_effect=["-1", "-1"]):
-        players = list(get_players(1))
+        players = list(generate_players(1))
         assert len(players) == 1

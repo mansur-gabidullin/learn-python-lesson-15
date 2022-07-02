@@ -1,11 +1,13 @@
 """Kegs Bag Entity."""
 
 import random
-from typing import List, Iterator
+from functools import total_ordering
+from typing import List, Iterator, Any
 
 from src.lotto_bingo.constants import KEGS_COUNT
 
 
+@total_ordering
 class KegsBag:
     """KegsBag class"""
 
@@ -27,6 +29,14 @@ class KegsBag:
 
     def __str__(self) -> str:
         return str(self.__kegs)
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(self, other.__class__):
+            return False
+        return all((keg in other for keg in self))
+
+    def __gt__(self, other: Any) -> bool:
+        return len(self) > len(other)
 
     def get_next(self) -> int:
         """Get next keg"""

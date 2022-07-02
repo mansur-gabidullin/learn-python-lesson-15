@@ -1,8 +1,9 @@
 """Game Strategy Entity"""
-from typing import Optional, List, TypedDict, Iterable
+from functools import total_ordering
+from typing import Optional, List, TypedDict, Iterable, Any
 
 from src.lotto_bingo.kegs_bag import KegsBag
-from src.lotto_bingo.player import get_players, ComputerPlayer, HumanPlayer
+from src.lotto_bingo.player import generate_players, ComputerPlayer, HumanPlayer
 from src.lotto_bingo.utils import wait, blinked, bolded, clear, underlined, need_break
 
 InitialGameState = TypedDict(
@@ -11,36 +12,49 @@ InitialGameState = TypedDict(
     total=False,
 )
 
+MESSAGE_GAME_CONTINUE = "Игра продолжается"
+MESSAGE_GAME_FINISHED = "Игра окончена"
 
+
+@total_ordering
 class GameStrategy:
     """GameStrategy class"""
 
-    _winner: Optional[ComputerPlayer | HumanPlayer] = None
-    _kegs: KegsBag = None
-    _losers: List[ComputerPlayer | HumanPlayer] = []
-    _players: List[ComputerPlayer | HumanPlayer] = []
+    _winner: Optional[ComputerPlayer | HumanPlayer]
+    _kegs: KegsBag
+    _losers: List[ComputerPlayer | HumanPlayer]
+    _players: List[ComputerPlayer | HumanPlayer]
 
-    @property
-    def winner(self) -> ComputerPlayer | HumanPlayer | None:
-        """get winner"""
-        return self._winner
-
-    def prepare(self, initial_state: InitialGameState | None = None) -> None:
-        """prepare game (initiate required variables)"""
+    def __init__(self, initial_state: InitialGameState | None = None):
         if initial_state is None:
             initial_state = InitialGameState()
 
         self._winner = None
         self._kegs = initial_state.get("kegs") or KegsBag()
         self._losers = losers if (losers := initial_state.get("losers")) is not None else []
-        self._players = players if (players := initial_state.get("players")) is not None else get_players()
+        self._players = list(players if (players := initial_state.get("players")) is not None else generate_players())
+
+    def __str__(self) -> str:
+        return MESSAGE_GAME_CONTINUE if self.is_running() else MESSAGE_GAME_FINISHED
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(self, other.__class__):
+            return False
+        return self._kegs == other._kegs and all((player in other._players for player in self._players))
+
+    def __gt__(self, other: Any) -> bool:
+        return len(self._players) > len(other._players)
+
+    @property
+    def winner(self) -> ComputerPlayer | HumanPlayer | None:
+        """get winner"""
+        return self._winner
 
     def cycle(self) -> None:
         """game live cycle"""
         while self.is_running() and not need_break():
             players = self._get_active_players()
             keg = self._kegs.get_next()
-            print(f"Новый бочонок: {blinked(bolded(str(keg)))} (осталось {len(self._kegs)})")
 
             for current_player in players:
                 self._move(current_player, keg)
@@ -62,8 +76,9 @@ class GameStrategy:
     def _move(self, player: ComputerPlayer | HumanPlayer, keg: int) -> None:
         """make player's move"""
         clear()
+        print(f"Новый бочонок: {blinked(bolded(str(keg)))} (осталось {len(self._kegs)})")
         current_card = player.card
-        print(f'Ходит игрок "{player.name}" ({player.type})')
+        print(f"Ходит игрок {player}")
 
         if player.type == "computer":
             if keg in current_card:
@@ -71,11 +86,15 @@ class GameStrategy:
             print("Карточка игрока:")
             print(current_card)
         else:
-
             print("Ваша карточка:")
             print(current_card)
 
             self.show_other_players_cards(player)
+            clear()
+
+            print(f"Новый бочонок: {blinked(bolded(str(keg)))} (осталось {len(self._kegs)})")
+            print("Ваша карточка:")
+            print(current_card)
 
             print(f"Вычеркнуть номер {blinked(bolded(str(keg)))} из карточки?")
             print("1. Нет")
@@ -90,7 +109,7 @@ class GameStrategy:
             if keg in current_card and not need_strike or keg not in current_card and need_strike:
                 self._losers.append(player)
                 clear()
-                print(blinked(f'Игрок "{player.name}" ({player.type}) ' + underlined(bolded("ПРОИГРАЛ!"))))
+                print(blinked(f"Игрок {player} {underlined(bolded('ПРОИГРАЛ!'))}"))
                 wait()
 
             if need_strike and keg in current_card:
@@ -123,16 +142,16 @@ class GameStrategy:
                 print("Компьютеры:")
 
                 for computer in computers:
-                    print(f'Карточка "{computer.name}":')
+                    print(f'Карточка "{computer}":')
                     print(computer.card)
 
-            if len(humans) > 0:
                 wait()
+
+            if len(humans) > 0:
                 print("Люди:")
 
                 for human in humans:
-                    print(f'Карточка "{human.name}":')
+                    print(f'Карточка "{human}":')
                     print(human.card)
 
-            wait()
-            clear()
+                wait()

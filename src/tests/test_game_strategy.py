@@ -1,10 +1,10 @@
 """Test Game Strategy Entity."""
-from typing import Any, Iterable
+from typing import Any
 from unittest.mock import patch, PropertyMock, MagicMock
 
 from src.lotto_bingo.card import Card
 from src.lotto_bingo.constants import KEGS_COUNT
-from src.lotto_bingo.game_strategy import GameStrategy, InitialGameState
+from src.lotto_bingo.game_strategy import GameStrategy, InitialGameState, MESSAGE_GAME_CONTINUE, MESSAGE_GAME_FINISHED
 from src.lotto_bingo.kegs_bag import KegsBag
 from src.lotto_bingo.player import ComputerPlayer, HumanPlayer
 from src.lotto_bingo.utils import identity
@@ -21,68 +21,59 @@ from src.lotto_bingo.utils import identity
 class TestGameStrategy:
     """Test GameStrategy class"""
 
-    @patch("src.lotto_bingo.game_strategy.get_players", return_value=[ComputerPlayer("Test", Card())])
-    def test_prepare_method(self, *_: Iterable[Any]) -> None:
+    @patch("src.lotto_bingo.game_strategy.generate_players", return_value=[ComputerPlayer("Test", Card())])
+    def test_prepare_method(self, *_: Any) -> None:
         """checks prepare method"""
         strategy = GameStrategy()
-        strategy.prepare()
         assert not strategy.winner
 
-    @patch("src.lotto_bingo.game_strategy.get_players", return_value=[ComputerPlayer("Test", Card())])
-    def test_prepare_method_with_empty_state(self, *_: Iterable[Any]) -> None:
+    @patch("src.lotto_bingo.game_strategy.generate_players", return_value=[ComputerPlayer("Test", Card())])
+    def test_prepare_method_with_empty_state(self, *_: Any) -> None:
         """checks prepare method with given an empty state"""
         state = InitialGameState()
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
-    def test_prepare_method_with_custom_state(self, *_: Iterable[Any]) -> None:
+    def test_prepare_method_with_custom_state(self, *_: Any) -> None:
         """checks prepare method with given a custom state"""
         computer = ComputerPlayer("custom computer", Card())
         state = InitialGameState(players=[computer], losers=[computer], kegs=KegsBag(list(range(KEGS_COUNT))))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
-    def test_prepare_method_with_incorrect_state(self, *_: Iterable[Any]) -> None:
+    def test_prepare_method_with_incorrect_state(self, *_: Any) -> None:
         """checks prepare method with given an incorrect state"""
         state = InitialGameState(players=[], losers=[], kegs=KegsBag([]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         assert not strategy.winner
 
-    def test_computer_move(self, *_: Iterable[Any]) -> None:
+    def test_computer_move(self, *_: Any) -> None:
         """checks computer movement"""
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[computer], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == computer
 
     @patch("builtins.input", side_effect=("2", "2"))
-    def test_human_move(self, *_: Iterable[Any]) -> None:
+    def test_human_move(self, *_: Any) -> None:
         """checks human movement"""
         human = HumanPlayer("custom human", Card([1]))
         state = InitialGameState(players=[human], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == human
 
-    def test_not_showing_other_players_cards_when_others_not_exist(
-        self, print_mock: MagicMock, *_: Iterable[Any]
-    ) -> None:
+    def test_not_showing_other_players_cards_when_others_not_exist(self, print_mock: MagicMock, *_: Any) -> None:
         """checks no cards is printed when no other players"""
         human = HumanPlayer("custom human")
         state = InitialGameState(players=[human])
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.show_other_players_cards(human)
         assert not print_mock.called
 
     @patch("builtins.input", return_value="2")
-    def test_showing_only_computer_player_card(self, *_: Iterable[Any]) -> None:
+    def test_showing_only_computer_player_card(self, *_: Any) -> None:
         """checks only computer player is printed"""
 
         with patch("src.lotto_bingo.player.HumanPlayer.card", PropertyMock()) as human_card_mock:
@@ -90,15 +81,14 @@ class TestGameStrategy:
                 human = HumanPlayer("custom human")
                 computer = ComputerPlayer("custom computer")
                 state = InitialGameState(players=[human, computer])
-                strategy = GameStrategy()
-                strategy.prepare(state)
+                strategy = GameStrategy(state)
                 strategy.show_other_players_cards(human)
 
                 assert not human_card_mock.called
                 assert computer_card_mock.called
 
     @patch("builtins.input", return_value="2")
-    def test_showing_only_human_players_cards(self, *_: Iterable[Any]) -> None:
+    def test_showing_only_human_players_cards(self, *_: Any) -> None:
         """checks only human player is printed"""
 
         with patch("src.lotto_bingo.player.HumanPlayer.card", PropertyMock()) as human_card_mock:
@@ -106,32 +96,56 @@ class TestGameStrategy:
                 human = HumanPlayer("custom human")
                 computer = ComputerPlayer("custom computer")
                 state = InitialGameState(players=[human, computer])
-                strategy = GameStrategy()
-                strategy.prepare(state)
+                strategy = GameStrategy(state)
                 strategy.show_other_players_cards(computer)
 
                 assert human_card_mock.called
                 assert not computer_card_mock.called
 
     @patch("builtins.input", side_effect=("2", "-1", "-1", "2"))
-    def test_winner(self, *_: Iterable[Any]) -> None:
+    def test_winner(self, *_: Any) -> None:
         """checks correct winner"""
         human = HumanPlayer("custom human", Card([1]))
         human2 = HumanPlayer("custom human 2", Card([1]))
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[human, human2, computer], losers=[], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert strategy.winner == human2
 
-    def test_losers(self, *_: Iterable[Any]) -> None:
+    def test_losers(self, *_: Any) -> None:
         """checks losers"""
         human = HumanPlayer("custom human", Card([1]))
         human2 = HumanPlayer("custom human 2", Card([1]))
         computer = ComputerPlayer("custom computer", Card([1]))
         state = InitialGameState(players=[human, human2, computer], losers=[human, human2, computer], kegs=KegsBag([1]))
-        strategy = GameStrategy()
-        strategy.prepare(state)
+        strategy = GameStrategy(state)
         strategy.cycle()
         assert not strategy.winner
+
+    def test_continue_strategy_status(self, *_: Any) -> None:
+        """checks continue strategy status"""
+        human = HumanPlayer("custom human", Card([1]))
+        state = InitialGameState(players=[human], kegs=KegsBag([1]))
+        strategy = GameStrategy(state)
+        assert MESSAGE_GAME_CONTINUE in str(strategy)
+
+    def test_finished_strategy_status(self, *_: Any) -> None:
+        """checks finished strategy status"""
+        state = InitialGameState(players=[])
+        strategy = GameStrategy(state)
+        assert MESSAGE_GAME_FINISHED in str(strategy)
+
+    def test_game_strategies_are_equal(self, *_: Any) -> None:
+        """checks game strategies are equal"""
+        state = InitialGameState(players=[])
+        strategy_one = GameStrategy(state)
+        strategy_other = GameStrategy(state)
+        assert strategy_one == strategy_other
+        assert strategy_one != {"winner": None}
+
+    def test_one_game_strategy_is_great_then_other(self, *_: Any) -> None:
+        """checks game strategy is great then other"""
+        strategy_one = GameStrategy(InitialGameState(players=[ComputerPlayer("test computer")]))
+        strategy_other = GameStrategy(InitialGameState(players=[]))
+        assert strategy_one > strategy_other

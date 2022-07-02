@@ -1,16 +1,27 @@
 """Player Entity."""
 from abc import ABCMeta, abstractmethod
-from typing import Literal, Iterator, Type
+from functools import total_ordering
+from typing import Literal, Iterator, Type, cast
 
 from src.lotto_bingo.card import Card
-from src.lotto_bingo.utils import clear
+from src.lotto_bingo.utils import clear, bolded, underlined
 
 
 class Player(metaclass=ABCMeta):
     """Player class"""
 
     def __init__(self, name: str | None = None, card: Card = None):
-        self.__name, self.__card = name or "anonymous", card or Card()
+        self.__name = name or "anonymous"
+        self.__card = card if card is not None else Card()
+
+    def __str__(self) -> str:
+        return f"{bolded(underlined(self.name))} ({self.type})"
+
+    def __eq__(self, other: object) -> bool:
+        return self is other
+
+    def __gt__(self, other: object) -> bool:
+        return bool(self.card > cast(Player, other).card)
 
     @property
     def name(self) -> str:
@@ -29,6 +40,7 @@ class Player(metaclass=ABCMeta):
         raise NotImplementedError
 
 
+@total_ordering
 class HumanPlayer(Player):
     """HumanPlayer class"""
 
@@ -37,6 +49,7 @@ class HumanPlayer(Player):
         return "human"
 
 
+@total_ordering
 class ComputerPlayer(Player):
     """ComputerPlayer class"""
 
@@ -45,7 +58,7 @@ class ComputerPlayer(Player):
         return "computer"
 
 
-def get_players(
+def generate_players(
     players_count: int | None = None, player_class: Type[ComputerPlayer] | Type[HumanPlayer] | None = None
 ) -> Iterator[ComputerPlayer | HumanPlayer]:
     """generate (yields) a player sequence"""
